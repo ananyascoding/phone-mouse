@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Phone Mouse</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+    <style>
+        html, body {
+            margin: 0;
+            height: 100%;
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #181818;
+            color: white;
+            overflow: hidden; /* 🔥 no scrolling */
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        /* Top bar */
+        .top-bar {
+            height: 40px;
+            padding: 5px 10px;
+            font-size: 13px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #222;
+        }
+
+        .status {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: red;
+        }
+
+        /* Trackpad */
+        #touchArea {
+            flex: 1;
+            background: #2c2c2c;
+        }
+
+        /* Bottom controls */
+        .controls {
+            height: 120px; /* 🔥 fixed small height */
+            background: #222;
+            display: flex;
+            flex-direction: column;
+            padding: 6px 10px;
+            padding-bottom: calc(6px + env(safe-area-inset-bottom));
+        }
+
+        .buttons {
+            display: flex;
+            height: 50px;
+            margin-bottom: 5px;
+        }
+
+        button {
+            flex: 1;
+            font-size: 14px;
+            border: none;
+            background: #444;
+            color: white;
+        }
+
+        button:active {
+            background: #666;
+        }
+
+        .slider-label {
+            font-size: 12px;
+            margin-bottom: 2px;
+        }
+
+        input[type=range] {
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="top-bar">
+        <div>Phone Mouse</div>
+        <div class="status">
+            <div class="dot" id="statusDot"></div>
+            <span id="statusText">Disconnected</span>
+        </div>
+    </div>
+
+    <div id="touchArea"></div>
+
+    <div class="controls">
+        <div class="buttons">
+            <button onclick="leftClick()">Click</button>
+            <button onclick="rightClick()">Right</button>
+        </div>
+
+        <div class="slider-label">
+            Sensitivity: <span id="sensValue">3.0</span>
+        </div>
+        <input type="range" min="1" max="6" step="0.1" value="3.0" id="slider">
+    </div>
+
+</div>
+
+<script>
+const SERVER = "http://192.168.1.5:5050";
+
+let lastX = 0, lastY = 0;
+let sensitivity = 3.0;
+let tapStartTime = 0;
+
+const area = document.getElementById("touchArea");
+const slider = document.getElementById("slider");
+const sensValue = document.getElementById("sensValue");
+const statusDot = document.getElementById("statusDot");
+const statusText = document.getElementById("statusText");
+
+// Slider
+slider.addEventListener("input", () => {
+    sensitivity = parseFloat(slider.value);
+    sensValue.textContent = sensitivity.toFixed(1);
+});
+
+// Prevent scroll
+document.addEventListener("touchmove", e => {
+    e.preventDefault();
+}, { passive: false });
+
+// Connection check
+setInterval(async () => {
+    try {
+        await fetch(SERVER + "/move", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({dx:0, dy:0})
+        });
+
+        statusDot.style.background = "lime";
+        statusText.textContent = "Connected";
+    } catch {
+        statusDot.style.background = "red";
+        statusText.textContent = "Disconnected";
+    }
+}, 2000);
+
+// Touch start
+area.addEventListener("touchstart", e => {
+    lastX = e.touches[0].clientX;
+    lastY = e.touches[0].clientY;
+    tapStartTime = Date.now();
+});
+
+// Touch move
+area.addEventListener("touchmove", e => {
+
+    if (e.touches.length === 2) {
+        let y = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+        let dy = (y - lastY) * 0.8;
+
+        fetch(SERVER + "/scroll", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({dy: dy})
+        });
+
+        lastY = y;
+        return;
+    }
+
+    let x = e.touches[0].clientX;
+    let y = e.touches[0].clientY;
+
+    let rawDx = x - lastX;
+    let rawDy = y - lastY;
+
+    let speed = Math.sqrt(rawDx**2 + rawDy**2);
+    let accel = Math.min(speed / 8, 3);
+
+    let dx = rawDx * sensitivity * accel * 0.3;
+    let dy = rawDy * sensitivity * accel * 0.3;
+
+    if (Math.abs(dx) < 0.3 && Math.abs(dy) < 0.3) return;
+
+    fetch(SERVER + "/move", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({dx: dx, dy: dy})
+    });
+
+    lastX = x;
+    lastY = y;
+});
+
+// Tap
+area.addEventListener("touchend", () => {
+    if (Date.now() - tapStartTime < 200) {
+        fetch(SERVER + "/click", { method: "POST" });
+    }
+});
+
+function leftClick() {
+    fetch(SERVER + "/click", { method: "POST" });
+}
+
+function rightClick() {
+    fetch(SERVER + "/right_click", { method: "POST" });
+}
+</script>
+
+</body>
+</html>
