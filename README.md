@@ -37,7 +37,7 @@ Setup Instructions
 
 1. Clone the Repository
 
-git clone https://github.com/YOUR_USERNAME/phone-mouse.git
+git clone https://github.com/ananyascoding/phone-mouse.git
 cd phone-mouse
 
 
