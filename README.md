@@ -1,39 +1,39 @@
-📱 Phone Mouse (WiFi Trackpad)
+Phone Mouse (WiFi Trackpad)
 
 Turn your iPhone into a wireless trackpad for your laptop using a simple client-server system.
 
 ⸻
 
-🚀 Features
-	•	🖱️ Smooth cursor movement using touch gestures
-	•	👆 Tap to click
-	•	🔘 Left and right click buttons
-	•	🌀 Two-finger scrolling
-	•	🎚 Adjustable sensitivity
-	•	📶 Connection status indicator
+Features
+	•	Smooth cursor movement using touch gestures
+	•	Tap to click
+	•	Left and right click buttons
+	•	Two-finger scrolling
+	•	Adjustable sensitivity
+	•	Connection status indicator
 
 ⸻
 
-🧠 How It Works
+How It Works
 	•	The iPhone acts as a touch controller via a web interface
-	•	Touch data is sent over WiFi using HTTP requests
+	•	Touch input is sent over WiFi using HTTP requests
 	•	A Python Flask server receives the data
 	•	pyautogui controls the mouse on the laptop
 
 ⸻
 
-📂 Project Structure
+Project Structure
 
 phone-mouse/
 │
-├── server.py          # Flask server (controls mouse)
+├── server.py          # Flask server (mouse control)
 ├── test.html          # Web interface for phone
 └── requirements.txt   # Python dependencies
 
 
 ⸻
 
-🛠️ Setup Instructions
+Setup Instructions
 
 1. Clone the Repository
 
@@ -54,7 +54,7 @@ pip3 install -r requirements.txt
 
 python3 server.py
 
-You should see:
+Expected output:
 
 Running on http://192.168.1.5:5050
 
@@ -72,24 +72,24 @@ python3 -m http.server 8000
 
 5. Open on Your Phone
 
-Make sure your phone and laptop are on the same WiFi.
+Ensure both devices are on the same WiFi network.
 
-On your iPhone (Safari), open:
+Open Safari on your iPhone and go to:
 
 http://192.168.1.5:8000/test.html
 
 
 ⸻
 
-⚠️ Important Notes
-	•	Enable Accessibility permissions for Terminal/Python on macOS
-	•	Both devices must be on the same WiFi network
-	•	Use Safari on iPhone for best compatibility
-	•	If the server does not start, ensure port 5050 is not blocked
+Notes
+	•	Grant Accessibility permissions to Terminal/Python on macOS
+	•	Both devices must be connected to the same network
+	•	Safari is recommended for best compatibility
+	•	If needed, update the IP address based on your local network
 
 ⸻
 
-🎯 What This Project Demonstrates
+What This Project Demonstrates
 	•	Client-server communication
 	•	Real-time input handling
 	•	Gesture recognition
@@ -97,22 +97,18 @@ http://192.168.1.5:8000/test.html
 
 ⸻
 
-🔥 Future Improvements
-	•	Native iOS app (Swift)
+Future Improvements
+	•	Native iOS application (Swift)
 	•	Keyboard input support
-	•	Media controls (volume/play/pause)
-	•	Multi-gesture shortcuts
+	•	Media controls
+	•	Advanced gesture shortcuts
 
 ⸻
 
-👩‍💻 Author
+Author
 
 Ananya Sharma
 :::
 
-⸻
-
-⚠️ One small thing
-
-Replace with your own IP if required!
-
+If you want next:
+👉 I can help you add a demo section with screenshots/GIF — that’s what really makes recruiters notice it.
